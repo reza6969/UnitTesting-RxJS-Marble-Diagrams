@@ -31,6 +31,19 @@ describe('can support observable data mocking', () => {
 
         expect($result).toBeObservable($expected);
     });
+
+    it('can search book by title', () => {
+        const $title = cold('--t--', { t: 'The Road Ahead' });
+
+        const $result = searchBook($title);
+
+        const $expected = cold('--b--', {
+            b: { author: 'Bill Gates',
+            libraryID: 1254, title: 'The Road Ahead' }
+        });
+
+        expect($result).toBeObservable($expected);
+    });
 });
 
 function findCount(text, $toSearch) {
@@ -60,4 +73,10 @@ function searchBook($title) {
             libraryID: 1253
         }
     ]
+
+    return $title.pipe(
+        switchMap(title => of
+            (library.filter(book =>
+                book.title === title).pop()))
+    );
 }
