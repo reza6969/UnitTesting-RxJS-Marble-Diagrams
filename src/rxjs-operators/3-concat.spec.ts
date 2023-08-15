@@ -38,4 +38,30 @@ describe('concat operator', () => {
     expect($obs1).toHaveSubscriptions(sub1);
     expect($obs2).toHaveSubscriptions(sub2);
   });
+
+  it('serving pizaa to customer', () => {
+    const status = {
+      orderCreated: '🏠 oder placed',
+      paymentReceived: '💰 received',
+      orderReady: '🍕 ready 😋',
+      orderShipped: '🍕 shipped 🚀'
+    };
+    const $orderCtreated = cold('--c--|', { c: status.orderCreated });
+    const $paymentReceived = cold('---p|', { p: status.paymentReceived });
+    const $orderReady = cold('-r-|', { r: status.orderReady });
+    const $orderShipped = cold('---s--|', { s: status.orderShipped });
+    const $expected = cold('--f-----u-n----i--|', {
+      f: status.orderCreated,
+      u: status.paymentReceived,
+      n: status.orderReady,
+      i: status.orderShipped
+    });
+    const $result = servePizza($orderCtreated, $paymentReceived, $orderReady, $orderShipped);
+
+    expect($result).toBeObservable($expected);
+  });
 });
+
+function servePizza($sale, $payment, $kitchen, $shipOrReadyForPickup) {
+  return $sale.pipe(concat($payment, $kitchen, $shipOrReadyForPickup));
+}
