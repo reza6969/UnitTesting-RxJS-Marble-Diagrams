@@ -48,6 +48,24 @@ describe('DashboardComponent', () => {
     expect(component.users).toEqual(users);
   });
 
+  //Testing Race Condition
+  it('can search user in proper sequence', () => {
+    userApi.searchUser = jest.fn(() => 
+      cold('--------a|', {a: [{ first: 'John' }] })
+    );
+    // component.search('John');
+    component.onKeyUp('John');
+
+    userApi.searchUser = jest.fn(() => 
+      cold('--b|', { b: [{ first: 'Sean' }] })
+    );
+    // component.search('Sean');
+    component.onKeyUp('Sean');
+
+    getTestScheduler().flush();
+    expect(component.users).toEqual([{ first: 'Sean' }]);
+  });
+
   it('RACE CONDITION: can search user by first name', () => {
 
   });
