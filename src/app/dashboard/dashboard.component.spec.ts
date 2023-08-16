@@ -73,5 +73,21 @@ describe('DashboardComponent', () => {
   it('RACE CONDITION FIXED: can search user by first name', () => {
    
   });
+
+  it('Debounce before searching user by first name', () => {
+    component.debounce = 30;
+    const response = cold('--a|',{ a: [{ first: 'Chandra'}] });
+    const expected = cold('------b|', { b: [{ first: 'Chandra'}] });
+
+    userApi.searchUser = jest.fn(() => response);
+    const scheduler = getTestScheduler();
+    component.scheduler = scheduler;
+
+    fixture.detectChanges();
+    component.onKeyUp('Chandra');
+    scheduler.flush();
+
+    expect(component.users).toEqual(expected.values['b']);
+  });
 });
 
