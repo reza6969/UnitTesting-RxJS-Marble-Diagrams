@@ -5,6 +5,7 @@ import { UserApi } from '../api/user.api';
 import { FormsModule } from '@angular/forms';
 import { cold, getTestScheduler } from 'jasmine-marbles';
 import { RouterTestingModule } from '@angular/router/testing';
+import { User } from '../models/user';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -38,7 +39,13 @@ describe('DashboardComponent', () => {
   });
 
   it('can search user by first name', () => {
-
+    const user: User = { first: 'Reza', id: '23' };
+    const users = [user];
+    const response$ = cold('-----a|', {a: users });
+    userApi.searchUser = jest.fn(() => response$);
+    component.search('Reza');
+    getTestScheduler().flush();
+    expect(component.users).toEqual(users);
   });
 
   it('RACE CONDITION: can search user by first name', () => {
